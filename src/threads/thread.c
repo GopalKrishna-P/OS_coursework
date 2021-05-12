@@ -11,6 +11,8 @@
 #include "threads/switch.h"
 #include "threads/synch.h"
 #include "threads/vaddr.h"
+/* for using the func timer_ticks()*/
+#include "devices/timer.h"
 #ifdef USERPROG
 #include "userprog/process.h"
 #endif
@@ -23,6 +25,10 @@
 /* List of processes in THREAD_READY state, that is, processes
    that are ready to run but not actually running. */
 static struct list ready_list;
+
+/* List of processes in sleep state. Processes that are blocked
+   are added to this list and later unblocked after waiting */
+static struct list wait_list;
 
 /* List of all processes.  Processes are added to this list
    when they are first scheduled and removed when they exit. */
@@ -91,6 +97,7 @@ thread_init (void)
 
   lock_init (&tid_lock);
   list_init (&ready_list);
+  list_init (&wait_list);
   list_init (&all_list);
 
   /* Set up a thread structure for the running thread. */
@@ -98,6 +105,7 @@ thread_init (void)
   init_thread (initial_thread, "main", PRI_DEFAULT);
   initial_thread->status = THREAD_RUNNING;
   initial_thread->tid = allocate_tid ();
+  initial_thread->sleep_endtick = 0;
 }
 
 /* Starts preemptive thread scheduling by enabling interrupts.
@@ -120,7 +128,7 @@ thread_start (void)
 /* Called by the timer interrupt handler at each timer tick.
    Thus, this function runs in an external interrupt context. */
 void
-thread_tick (void) 
+thread_tick (void)
 {
   struct thread *t = thread_current ();
 
@@ -134,9 +142,35 @@ thread_tick (void)
   else
     kernel_ticks++;
 
+  /* Waking threads whose sleep_endtick are done. */
+  thread_wake ();
+
   /* Enforce preemption. */
   if (++thread_ticks >= TIME_SLICE)
     intr_yield_on_return ();
+}
+
+/* Wake up all sleeping threads whose ticks_end has been expired,
+   removing from the wait queue and pushing it into the ready queue.
+   This function must be called with interrupts turned off. */
+void
+thread_wake (void)
+{
+  ASSERT (intr_get_level () == INTR_OFF);
+
+  /* iterating through all the threads in wait queue. */
+  struct list_elem *e;
+  for (e = list_begin (&wait_list); e != list_end (&wait_list); e = list_next (e))
+    {
+      struct thread *t = list_entry (e, struct thread, waitelem);
+      if (t->sleep_endtick <= timer_ticks()) {
+        /* reset the sleep ticks and remove from waitlist */
+        t->sleep_endtick = 0;
+        list_remove (&t->waitelem);
+        /* unblock the thread */
+        thread_unblock (t);
+      }
+    }
 }
 
 /* Prints thread statistics. */
@@ -202,6 +236,38 @@ thread_create (const char *name, int priority,
   thread_unblock (t);
 
   return tid;
+}
+
+/* Put the current thread to sleep, until the timer ticks.
+
+   It turns of the interrupts and subsequently calls thread_block()
+   and restores level before the interrupts were turned off*/
+void
+thread_sleep (int64_t ticks)
+{
+  /* validating input (i.e ticks > 0) */
+  if (ticks <= 0)
+    return;
+
+  /* Disabling the interrupts */
+  enum intr_level old_level = intr_disable ();
+
+  /* get current thread */
+  struct thread *curr = thread_current ();
+  
+  ASSERT(curr->status == THREAD_RUNNING);
+
+  /* set the timers for the sleep */
+  curr->sleep_endtick = timer_ticks () + ticks;
+
+  /* put T into the wait queue */
+  list_push_back (&wait_list, &curr->waitelem);
+
+  /* make the current thread block (sleeped) */
+  thread_block();
+
+  /* reset the interrupts to the level before turing off */
+  intr_set_level (old_level);
 }
 
 /* Puts the current thread to sleep.  It will not be scheduled
@@ -463,6 +529,7 @@ init_thread (struct thread *t, const char *name, int priority)
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
   t->magic = THREAD_MAGIC;
+  t->sleep_endtick = 0;
 
   old_level = intr_disable ();
   list_push_back (&all_list, &t->allelem);
