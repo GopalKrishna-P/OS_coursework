@@ -4,11 +4,17 @@
 #include <list.h>
 #include <stdbool.h>
 
+/* Helper functions. */
+bool thread_priority_comparator(const struct list_elem*, const struct list_elem*, void *);
+bool lock_priority_comparator(const struct list_elem*, const struct list_elem*, void *);
+bool sema_priority_comparator(const struct list_elem*, const struct list_elem*, void *);
+
 /* A counting semaphore. */
 struct semaphore 
   {
     unsigned value;             /* Current value. */
     struct list waiters;        /* List of waiting threads. */
+    int priority;               /* priority of the the thread holding the lock (for priority donation) */
   };
 
 void sema_init (struct semaphore *, unsigned value);
@@ -22,6 +28,8 @@ struct lock
   {
     struct thread *holder;      /* Thread holding lock (for debugging). */
     struct semaphore semaphore; /* Binary semaphore controlling access. */
+    struct list_elem elem;      /* Element of locks_acquired list in thread */
+    int priority;               /* priority of the the thread holding the lock (for priority donation) */
   };
 
 void lock_init (struct lock *);
