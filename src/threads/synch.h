@@ -6,6 +6,7 @@
 
 /* Helper functions. */
 bool thread_priority_comparator(const struct list_elem*, const struct list_elem*, void *);
+bool ticks_priority_comparator(const struct list_elem*, const struct list_elem*, void *);
 bool lock_priority_comparator(const struct list_elem*, const struct list_elem*, void *);
 bool sema_priority_comparator(const struct list_elem*, const struct list_elem*, void *);
 

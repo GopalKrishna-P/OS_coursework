@@ -10,12 +10,18 @@
   
 /* See [8254] for hardware details of the 8254 timer chip. */
 
+// Used for BSD scheduler
+#define RECALC_FREQ 4
+
 #if TIMER_FREQ < 19
 #error 8254 timer requires TIMER_FREQ >= 19
 #endif
 #if TIMER_FREQ > 1000
 #error TIMER_FREQ <= 1000 recommended
 #endif
+
+/* List of processes sleeping */
+static struct list sleep_list;
 
 /* Number of timer ticks since OS booted. */
 static int64_t ticks;
@@ -37,6 +43,7 @@ timer_init (void)
 {
   pit_configure_channel (0, 2, TIMER_FREQ);
   intr_register_ext (0x20, timer_interrupt, "8254 Timer");
+  list_init(&sleep_list);
 }
 
 /* Calibrates loops_per_tick, used to implement brief delays. */
@@ -60,7 +67,7 @@ timer_calibrate (void)
   /* Refine the next 8 bits of loops_per_tick. */
   high_bit = loops_per_tick;
   for (test_bit = high_bit >> 1; test_bit != high_bit >> 10; test_bit >>= 1)
-    if (!too_many_loops (loops_per_tick | test_bit))
+    if (!too_many_loops (high_bit | test_bit))
       loops_per_tick |= test_bit;
 
   printf ("%'"PRIu64" loops/s.\n", (uint64_t) loops_per_tick * TIMER_FREQ);
@@ -87,14 +94,22 @@ timer_elapsed (int64_t then)
 /* Sleeps for approximately TICKS timer ticks.  Interrupts must
    be turned on. */
 void
-timer_sleep (int64_t ticks) 
+timer_sleep (int64_t ticks)
 {
-  int64_t start = timer_ticks ();
-
   ASSERT (intr_get_level () == INTR_ON);
-
-  /* Put current thread to sleep for a fixed ticks */
-  thread_sleep (ticks);
+  if (ticks <= 0)
+    {
+      return;
+    }
+  /* Turn interrupts off temporarily to:
+     - calculate ticks to stop sleep
+     - add thread to sleep list
+     - block thread */
+  enum intr_level old_level = intr_disable ();
+  thread_current()->ticks = timer_ticks() + ticks;
+  list_insert_ordered(&sleep_list, &thread_current()->elem, ticks_priority_comparator, NULL);
+  thread_block();
+  intr_set_level(old_level);
 }
 
 /* Sleeps for approximately MS milliseconds.  Interrupts must be
@@ -173,6 +188,34 @@ timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
   thread_tick ();
+
+  if (thread_mlfqs)
+    {
+      mlfqs_increment();
+      if (ticks % TIMER_FREQ == 0)
+	{
+	  mlfqs_load_avg();
+	  mlfqs_recalc(); // Recalcs recent_cpu and priority
+	}
+      if (ticks % RECALC_FREQ == 0)
+	{
+	  mlfqs_priority(thread_current());
+	}
+    }
+
+  struct list_elem *e = list_begin(&sleep_list);
+  while (e != list_end(&sleep_list))
+    {
+      struct thread *t = list_entry(e, struct thread, elem);      
+      if (ticks < t->ticks)
+	{
+	  break;
+	}
+      list_remove(e); // remove from sleep list
+      thread_unblock(t); // Unblock and add to ready list
+      e = list_begin(&sleep_list);
+    }
+  test_max_priority(); // Tests if thread still has max priority
 }
 
 /* Returns true if LOOPS iterations waits for more than one timer

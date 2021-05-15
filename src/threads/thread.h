@@ -4,6 +4,7 @@
 #include <debug.h>
 #include <list.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 /* States in a thread's life cycle. */
 enum thread_status
@@ -23,6 +24,16 @@ typedef int tid_t;
 #define PRI_MIN 0                       /* Lowest priority. */
 #define PRI_DEFAULT 31                  /* Default priority. */
 #define PRI_MAX 63                      /* Highest priority. */
+
+/* Thread nice values. */
+#define NICE_MIN 20
+#define NICE_DEFAULT 0
+#define NICE_MAX 20
+
+/* Defaults for scheduler. */
+#define RECENT_CPU_DEFAULT 0
+#define LOAD_AVG_DEFAULT 0
+#define DEPTH_LIMIT 8
 
 /* A kernel thread or user process.
 
@@ -89,16 +100,20 @@ struct thread
     uint8_t *stack;                     /* Saved stack pointer. */
     int priority;                       /* Priority. */
     int old_priority;                   /* Old Priority. */
-    int64_t sleep_endtick;              /* ticks untill which threads must sleep. */
-    struct list_elem waitelem;          /* List element for wait threads list. */
+    int64_t ticks;                      /* ticks untill which threads must sleep. */
     struct list_elem allelem;           /* List element for all threads list. */
 
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
 
-    /* Priority Donation */
-    struct lock *waiting_lock;          /* The lock object on which this thread is waiting (or NULL if not locked) */
-    struct list locks;                  /* List of locks the thread holds (for multiple donations) */
+    /* Used for priority donation & scheduling */
+    struct lock *wait_on_lock;          /* The lock object on which this thread is waiting (or NULL if not locked) */
+    struct list donations;              /* List of locks the thread holds (for multiple donations) */
+    struct list_elem donation_elem;
+
+    /* Used for FreeBSD scheduling */
+    int nice;
+    int recent_cpu;
 
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
@@ -116,7 +131,6 @@ extern bool thread_mlfqs;
 
 void thread_init (void);
 void thread_start (void);
-void thread_wake (void);
 
 void thread_tick (void);
 void thread_print_stats (void);
@@ -140,11 +154,24 @@ void thread_foreach (thread_action_func *, void *);
 
 int thread_get_priority (void);
 void thread_set_priority (int);
-void thread_priority_donate (struct thread *t, int priority);
 
 int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
+
+/* Added functions */
+void test_max_priority (void);
+
+void mlfqs_priority (struct thread *t);
+void mlfqs_recent_cpu (struct thread *t);
+void mlfqs_load_avg (void);
+void mlfqs_increment (void);
+
+void mlfqs_recalc (void);
+
+void donate_priority (void);
+void remove_with_lock (struct lock *lock);
+void refresh_priority (void);
 
 #endif /* threads/thread.h */
