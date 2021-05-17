@@ -1,2 +1,3 @@
-# CSCC69-Pintos
+# Operating Systems
+
 
