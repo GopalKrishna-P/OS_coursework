@@ -120,6 +120,16 @@ struct thread
     uint32_t *pagedir;                  /* Page directory. */
 #endif
 
+    /* Used for user programs. */
+    int fd;                     /* File descriptor. */
+    struct list file_list;      /* List of files. */
+    struct file* executable;    /* Used restrict writes to exe.. */
+
+    tid_t parent;               /* Id of the parent. */
+    struct list child_list;     /* List of child processes. */
+    struct child_process* cp;   /* Pointers to child process. */
+    struct list lock_list;      /* List of locks the thread holds. */
+
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
   };
@@ -173,5 +183,9 @@ void mlfqs_recalc (void);
 void donate_priority (void);
 void remove_with_lock (struct lock *lock);
 void refresh_priority (void);
+
+int is_thread_alive (int pid);
+struct child_process* add_child_process (int pid);
+void thread_release_locks(void);
 
 #endif /* threads/thread.h */

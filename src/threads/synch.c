@@ -216,6 +216,7 @@ lock_acquire (struct lock *lock)
 
   thread_current()->wait_on_lock = NULL;
   lock->holder = thread_current ();
+  list_push_back(&thread_current()->lock_list, &lock->elem);
   intr_set_level(old_level);
 }
 
@@ -240,6 +241,7 @@ lock_try_acquire (struct lock *lock)
   {
     t->wait_on_lock = NULL;
     lock->holder = t;
+    list_push_back(&t->lock_list, &lock->elem);
   }
   intr_set_level(old_level);
   return success;
@@ -259,12 +261,11 @@ lock_release (struct lock *lock)
   enum intr_level old_level = intr_disable();
   lock->holder = NULL;
   if (!thread_mlfqs)
-    {
+  {
       remove_with_lock(lock);
-      // ^ Removes threads from donation list waiting for released lock
       refresh_priority();
-      // ^ Updates priority
-    }
+  }
+  list_remove(&lock->elem);
   sema_up (&lock->semaphore);
   intr_set_level (old_level);
 }
