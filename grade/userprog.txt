@@ -1,0 +1,303 @@
+warning: test tests/userprog/exec-bound-2 doesn't count for grading
+warning: test tests/userprog/exec-bound doesn't count for grading
+warning: test tests/userprog/exec-bound-3 doesn't count for grading
+warning: test tests/userprog/sc-boundary-3 doesn't count for grading
+TOTAL TESTING SCORE: 88.6%
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+SUMMARY BY TEST SET
+
+Test Set                                      Pts Max  % Ttl  % Max
+--------------------------------------------- --- --- ------ ------
+tests/userprog/Rubric.functionality           108/108  35.0%/ 35.0%
+tests/userprog/Rubric.robustness               83/ 88  23.6%/ 25.0%
+tests/userprog/no-vm/Rubric                     0/  1   0.0%/ 10.0%
+tests/filesys/base/Rubric                      30/ 30  30.0%/ 30.0%
+--------------------------------------------- --- --- ------ ------
+Total                                                  88.6%/100.0%
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+SUMMARY OF INDIVIDUAL TESTS
+
+Functionality of system calls (tests/userprog/Rubric.functionality):
+	- Test argument passing on Pintos command line.
+	     3/ 3 tests/userprog/args-none
+	     3/ 3 tests/userprog/args-single
+	     3/ 3 tests/userprog/args-multiple
+	     3/ 3 tests/userprog/args-many
+	     3/ 3 tests/userprog/args-dbl-space
+
+	- Test "create" system call.
+	     3/ 3 tests/userprog/create-empty
+	     3/ 3 tests/userprog/create-long
+	     3/ 3 tests/userprog/create-normal
+	     3/ 3 tests/userprog/create-exists
+
+	- Test "open" system call.
+	     3/ 3 tests/userprog/open-missing
+	     3/ 3 tests/userprog/open-normal
+	     3/ 3 tests/userprog/open-twice
+
+	- Test "read" system call.
+	     3/ 3 tests/userprog/read-normal
+	     3/ 3 tests/userprog/read-zero
+
+	- Test "write" system call.
+	     3/ 3 tests/userprog/write-normal
+	     3/ 3 tests/userprog/write-zero
+
+	- Test "close" system call.
+	     3/ 3 tests/userprog/close-normal
+
+	- Test "exec" system call.
+	     5/ 5 tests/userprog/exec-once
+	     5/ 5 tests/userprog/exec-multiple
+	     5/ 5 tests/userprog/exec-arg
+
+	- Test "wait" system call.
+	     5/ 5 tests/userprog/wait-simple
+	     5/ 5 tests/userprog/wait-twice
+
+	- Test "exit" system call.
+	     5/ 5 tests/userprog/exit
+
+	- Test "halt" system call.
+	     3/ 3 tests/userprog/halt
+
+	- Test recursive execution of user programs.
+	    15/15 tests/userprog/multi-recurse
+
+	- Test read-only executable feature.
+	     3/ 3 tests/userprog/rox-simple
+	     3/ 3 tests/userprog/rox-child
+	     3/ 3 tests/userprog/rox-multichild
+
+	- Section summary.
+	     28/ 28 tests passed
+	    108/108 points subtotal
+
+Robustness of system calls (tests/userprog/Rubric.robustness):
+	- Test robustness of file descriptor handling.
+	     2/ 2 tests/userprog/close-stdin
+	     2/ 2 tests/userprog/close-stdout
+	     2/ 2 tests/userprog/close-bad-fd
+	     2/ 2 tests/userprog/close-twice
+	     2/ 2 tests/userprog/read-bad-fd
+	     2/ 2 tests/userprog/read-stdout
+	     2/ 2 tests/userprog/write-bad-fd
+	     2/ 2 tests/userprog/write-stdin
+	     2/ 2 tests/userprog/multi-child-fd
+
+	- Test robustness of pointer handling.
+	     3/ 3 tests/userprog/create-bad-ptr
+	     3/ 3 tests/userprog/exec-bad-ptr
+	     3/ 3 tests/userprog/open-bad-ptr
+	     3/ 3 tests/userprog/read-bad-ptr
+	     3/ 3 tests/userprog/write-bad-ptr
+
+	- Test robustness of buffer copying across page boundaries.
+	     3/ 3 tests/userprog/create-bound
+	     3/ 3 tests/userprog/open-boundary
+	     3/ 3 tests/userprog/read-boundary
+	     3/ 3 tests/userprog/write-boundary
+
+	- Test handling of null pointer and empty strings.
+	     2/ 2 tests/userprog/create-null
+	     2/ 2 tests/userprog/open-null
+	     2/ 2 tests/userprog/open-empty
+
+	- Test robustness of system call implementation.
+	     3/ 3 tests/userprog/sc-bad-arg
+	     3/ 3 tests/userprog/sc-bad-sp
+	     5/ 5 tests/userprog/sc-boundary
+	     5/ 5 tests/userprog/sc-boundary-2
+
+	- Test robustness of "exec" and "wait" system calls.
+	  ** 0/ 5 tests/userprog/exec-missing
+	     5/ 5 tests/userprog/wait-bad-pid
+	     5/ 5 tests/userprog/wait-killed
+
+	- Test robustness of exception handling.
+	     1/ 1 tests/userprog/bad-read
+	     1/ 1 tests/userprog/bad-write
+	     1/ 1 tests/userprog/bad-jump
+	     1/ 1 tests/userprog/bad-read2
+	     1/ 1 tests/userprog/bad-write2
+	     1/ 1 tests/userprog/bad-jump2
+
+	- Section summary.
+	     33/ 34 tests passed
+	     83/ 88 points subtotal
+
+Functionality of features that VM might break (tests/userprog/no-vm/Rubric):
+
+	  ** 0/ 1 tests/userprog/no-vm/multi-oom
+
+	- Section summary.
+	      0/  1 tests passed
+	      0/  1 points subtotal
+
+Functionality of base file system (tests/filesys/base/Rubric):
+	- Test basic support for small files.
+	     1/ 1 tests/filesys/base/sm-create
+	     2/ 2 tests/filesys/base/sm-full
+	     2/ 2 tests/filesys/base/sm-random
+	     2/ 2 tests/filesys/base/sm-seq-block
+	     3/ 3 tests/filesys/base/sm-seq-random
+
+	- Test basic support for large files.
+	     1/ 1 tests/filesys/base/lg-create
+	     2/ 2 tests/filesys/base/lg-full
+	     2/ 2 tests/filesys/base/lg-random
+	     2/ 2 tests/filesys/base/lg-seq-block
+	     3/ 3 tests/filesys/base/lg-seq-random
+
+	- Test synchronized multiprogram access to files.
+	     4/ 4 tests/filesys/base/syn-read
+	     4/ 4 tests/filesys/base/syn-write
+	     2/ 2 tests/filesys/base/syn-remove
+
+	- Section summary.
+	     13/ 13 tests passed
+	     30/ 30 points subtotal
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+DETAILS OF tests/userprog/exec-missing FAILURE:
+
+Kernel panic in run: PANIC at ../../userprog/exception.c:102 in kill(): Kernel bug - unexpected interrupt in kernel
+Call stack: 0xc002c766 0xc0030ff8 0xc003110f 0xc0022d22 0xc0022fc0 0xc002c93f 0xc002cabd 0xc002d3f4 0xc002d71e 0xc0023dd8 0xc002f80c 0xc00212ee 0xc002f6c9 0xc002176f
+Translation of call stack:
+0xc002c766: debug_panic (.../../lib/kernel/debug.c:38)
+0xc0030ff8: kill (.../userprog/exception.c:108)
+0xc003110f: page_fault (....c:162 (discriminator 12))
+0xc0022d22: intr_handler (..../threads/interrupt.c:367)
+0xc0022fc0: intr_entry (threads/intr-stubs.S:38)
+0xc002c93f: is_head (...st.c:41 (discriminator 1))
+0xc002cabd: list_next (..../../lib/kernel/list.c:84)
+0xc002d3f4: find_end_of_run (...t.c:368 (discriminator 2))
+0xc002d71e: list_sort (.../../lib/kernel/list.c:428)
+0xc0023dd8: sema_up (...../../threads/synch.c:121)
+0xc002f80c: process_exit (...../userprog/process.c:155)
+0xc00212ee: thread_exit (..../../threads/thread.c:319)
+0xc002f6c9: start_process (.../../userprog/process.c:92)
+0xc002176f: kernel_thread (..../../threads/thread.c:477)
+
+OUTPUT FROM tests/userprog/exec-missing:
+
+Copying tests/userprog/exec-missing to scratch partition...
+squish-pty bochs -q
+PiLo hda1
+Loading...............
+Kernel command line: -q -f extract run exec-missing
+Pintos booting with 4,096 kB RAM...
+383 pages available in kernel pool.
+383 pages available in user pool.
+Calibrating timer...  102,400 loops/s.
+hda: 5,040 sectors (2 MB), model "BXHD00011", serial "Generic 1234"
+hda1: 245 sectors (122 kB), Pintos OS kernel (20)
+hda2: 4,096 sectors (2 MB), Pintos file system (21)
+hda3: 80 sectors (40 kB), Pintos scratch (22)
+filesys: using hda2
+scratch: using hda3
+Formatting file system...done.
+Boot complete.
+Extracting ustar archive from scratch device into file system...
+Putting 'exec-missing' into the file system...
+Erasing ustar archive...
+Executing 'exec-missing':
+(exec-missing) begin
+load: no-such-file: open failed
+(exec-missing) exec("no-such-file"): -1
+(exec-missing) end
+exec-missing: exit(0)
+Execution of 'exec-missing' complete.
+Page fault at 0xcccccccc: not present error reading page in kernel context.
+Interrupt 0x0e (#PF Page-Fault Exception) at eip=0xc002c93f
+ cr2=cccccccc error=00000000
+ eax=cccccccc ebx=c003de9c ecx=00000009 edx=cccccccc
+ esi=00000000 edi=00000000 esp=c010fe30 ebp=c010fe00
+ cs=0008 ds=0010 es=0010 ss=cabd
+Kernel PANIC at ../../userprog/exception.c:102 in kill(): Kernel bug - unexpected interrupt in kernel
+Call stack: 0xc002c766 0xc0030ff8 0xc003110f 0xc0022d22 0xc0022fc0 0xc002c93f 0xc002cabd 0xc002d3f4 0xc002d71e 0xc0023dd8 0xc002f80c 0xc00212ee 0xc002f6c9 0xc002176f.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Kernel PANIC recursion at ../../filesys/inode.c:336 in inode_allow_write().
+Page fault aTimer: 699 ticks
+t 0xccccccd0: noThread: 30 idle tickst present error writi, 573 kernel ticks, ng page in kern208 user ticks
+el context.
+Ihda2 (filesys): 84 renterrupt 0x0e (#PF Paads, 164 writes
+ge-Fault Exception)hda3 (scratch): 79 re at eip=0xc002cdef
+ads, 2 writes
+ cr2=ccccccd0Console: 1918 charac error=00000002
+ters output
+K eax=cccccccc ebx=eyboard: 0 keys pressec003de9c ecx=0000001d
+Exception: 20 edx=c010804c
+ page faults
+Power esi=00000000 edi=000ing off...
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+DETAILS OF tests/userprog/no-vm/multi-oom FAILURE:
+
+Kernel panic in run: PANIC at ../../userprog/pagedir.c:130 in pagedir_get_page(): assertion `is_user_vaddr (uaddr)' failed.
+Call stack: 0xc002c766 0xc0030950 0xc0031b44 0xc0031ad6 0xc0031351 0xc0022d22 0xc0022fc0 0x804b6d4 0x80481e2 0x80482b3 0x8048c51
+Translation of call stack:
+In kernel.o:
+0xc002c766: debug_panic (.../../lib/kernel/debug.c:38)
+0xc0030950: pagedir_get_page (...../userprog/pagedir.c:132)
+0xc0031b44: getpage_ptr (...../userprog/syscall.c:479)
+0xc0031ad6: validate_str (...l.c:459 (discriminator 1))
+0xc0031351: syscall_handler (...../userprog/syscall.c:137)
+0xc0022d22: intr_handler (..../threads/interrupt.c:367)
+0xc0022fc0: intr_entry (threads/intr-stubs.S:38)
+In tests/userprog/no-vm/multi-oom:
+0x0804b6d4: open (...../lib/user/syscall.c:105)
+0x080481e2: consume_some_resources_and_die (...prog/no-vm/multi-oom.c:86)
+0x080482b3: main (...rog/no-vm/multi-oom.c:119)
+0x08048c51: _start (.../../../lib/user/entry.c:9)
+Translations of user virtual addresses above are based on a guess at
+the binary to use.  If this guess is incorrect, then those
+translations will be misleading.
+
+OUTPUT FROM tests/userprog/no-vm/multi-oom:
+
+Copying tests/userprog/no-vm/multi-oom to scratch partition...
+squish-pty bochs -q
+PiLo hda1
+Loading...............
+Kernel command line: -q -f extract run multi-oom
+Pintos booting with 4,096 kB RAM...
+383 pages available in kernel pool.
+383 pages available in user pool.
+Calibrating timer...  102,400 loops/s.
+hda: 5,040 sectors (2 MB), model "BXHD00011", serial "Generic 1234"
+hda1: 245 sectors (122 kB), Pintos OS kernel (20)
+hda2: 4,096 sectors (2 MB), Pintos file system (21)
+hda3: 93 sectors (46 kB), Pintos scratch (22)
+filesys: using hda2
+scratch: using hda3
+Formatting file system...done.
+Boot complete.
+Extracting ustar archive from scratch device into file system...
+Putting 'multi-oom' into the file system...
+Erasing ustar archive...
+Executing 'multi-oom':
+(multi-oom) begin
+Kernel PANIC at ../../userprog/pagedir.c:130 in pagedir_get_page(): assertion `is_user_vaddr (uaddr)' failed.
+Call stack: 0xc002c766 0xc0030950 0xc0031b44 0xc0031ad6 0xc0031351 0xc0022d22 0xc0022fc0 0x804b6d4 0x80481e2 0x80482b3 0x8048c51.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 29107 ticks
+Thread: 30 idle ticks, 2721 kernel ticks, 26356 user ticks
+hda2 (filesys): 1071 reads, 190 writes
+hda3 (scratch): 92 reads, 2 writes
+Console: 1217 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off..
